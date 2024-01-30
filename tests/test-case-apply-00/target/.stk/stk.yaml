@@ -1,0 +1,13 @@
+schema-version: v2
+kind: manifest
+metadata:
+  name: custom-app
+  description: Default description
+  starter: temp-test-studio/temp-test-stack@0.0.1/temp-test-starter
+  stack-version-id: 01234567890123456789012345
+  stack: temp-test-stack@0.0.1
+spec:
+  type: app
+  plugins: []
+  global-inputs: {}
+  global-computed-inputs: {}
