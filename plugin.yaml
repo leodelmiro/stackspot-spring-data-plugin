@@ -2,7 +2,7 @@ schema-version: v2
 kind: plugin
 metadata:
   name: spring-data-jpa-plugin
-  display-name: spring-data-jpa-plugin
+  display-name: Spring Data Jpa Plugin
   description: Habilita persistência em banco de dados relacionais com Spring Data JPA e Hibernate
   version: 0.0.1
   picture: plugin.png
@@ -17,24 +17,65 @@ spec:
   repository: https://github.com/leodelmiro/stackspot-spring-data-plugin
   technologies: # Ref: https://docs.stackspot.com/create-use/create-content/yaml-files/plugin-yaml/#technologies-1
     - Api
+    - Kotlin
+    - Maven
+    - Spring Boot
   stk-projects-only: false
   inputs:
-    - label: Type name of your resource
-      name: resource
-      type: text
-      required: true
-      default: Client
-      pattern: '([A-Z][a-z]+)+'
-      help: 'Inform your resource name (e.g.: Client)'
-    - label: Choose http method of new endpoint
-      name: method
+    - label: Escolha um banco de dados relacional (RDBMS)
+      name: database_name
       type: text
       items:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-        - PATCH
-      default: GET
+        - H2
+        - PostgreSQL
+      default: H2
+      help: Se você não possui infraestrutura pronta, você pode escolher o H2 como banco em memória
+    - label: Informe o pacote base do seu projeto
+      name: project_base_package
+      type: text
       required: true
-      help: 'Inform the method of the endpoint (e.g.: post or delete)'
+      default: br.com.leodelmiro.springbase
+      help: Pacote base raiz (group_id + artifact_id)
+  computed-inputs:
+    database_name_formatted: "{{database_name | lower}}"
+    project_base_package_dir: "{{project_base_package | group_id_folder}}"
+  hooks:
+    ##
+    # Edit pom.xml
+    ##
+    - type: edit
+      path: pom.xml
+      trigger: after-render    
+      changes:
+        - search:
+            string: "</dependencies>"
+            insert-before:
+                snippet: snippets/snippet-pom.xml.jinja
+            when:
+                not-exists-snippet: snippets/snippet-pom.xml.jinja
+    ##
+    # Edit application.yaml
+    ##
+    - type: edit-yaml
+      path: src/main/resources/application.yml
+      trigger: after-render
+      indent: 4
+      encoding: UTF-8
+      changes:
+        - yamlpath: "$.spring"
+          update:
+            snippet: snippets/snippet-application.yml.jinja
+
+    ##
+    # Edit application-test.yaml
+    ##
+    - type: edit
+      path: src/test/resources/application-test.yml
+      trigger: after-render    
+      changes:
+        - search:
+            string: "spring:"
+            insert-after:
+                snippet: snippets/snippet-application-test.yml.jinja
+            when:
+                not-exists: "datasource:"
