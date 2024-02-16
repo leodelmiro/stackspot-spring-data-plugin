@@ -52,7 +52,13 @@ spec:
             insert-before:
                 snippet: snippets/snippet-pom.xml.jinja
             when:
-                not-exists-snippet: snippets/snippet-pom.xml.jinja
+                not-exists-snippet: snippets/snippet-pom.xml.jinja        
+        - search:
+            string: "</compilerPlugins>"
+            insert-before:
+                value: "						<plugin>jpa</plugin>\n"
+            when:
+                not-exists: "<plugin>jpa</plugin>"
     ##
     # Edit application.yaml
     ##
@@ -79,3 +85,6 @@ spec:
                 snippet: snippets/snippet-application-test.yml.jinja
             when:
                 not-exists: "datasource:"
+    - type: render-templates
+      path: snippets/samples
+      trigger: after-render
