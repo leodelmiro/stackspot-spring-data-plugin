@@ -30,6 +30,7 @@ spec:
         - PostgreSQL
       default: H2
       help: Se você não possui infraestrutura pronta, você pode escolher o H2 como banco em memória
+      global: true
     - label: Informe o pacote base do seu projeto
       name: project_base_package
       type: text
